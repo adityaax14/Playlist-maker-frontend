@@ -1,0 +1,327 @@
+
+/* ================= ROOT CONTAINER ================= */
+.course-detail-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 56px 48px 120px;
+  color: #e5e7eb;
+}
+
+/* ================= COURSE HEADER ================= */
+.course-header {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: linear-gradient(
+    145deg,
+    rgba(17, 24, 39, 0.95),
+    rgba(3, 7, 18, 0.95)
+  );
+  border-radius: 28px;
+  padding: 40px 44px;
+  margin-bottom: 44px;
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.45);
+}
+
+.course-header h1 {
+  font-size: 2.3rem;
+  font-weight: 700;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+/* ================= ADD LESSON BUTTON ================= */
+.add-lesson-btn {
+  align-self: flex-start;
+  margin-top: 6px;
+  background: #22c55e;
+  color: #022c22;
+  font-weight: 600;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.add-lesson-btn:hover {
+  background: #16a34a;
+  transform: translateY(-1px);
+}
+
+/* ================= COURSE META ================= */
+.course-desc {
+  margin-top: 12px;
+  color: #9ca3af;
+  line-height: 1.65;
+  font-size: 1.05rem;
+  max-width: 900px;
+}
+
+.course-creator {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.95rem;
+  color: #22c55e;
+  font-weight: 500;
+}
+
+.creator-note {
+  margin: 24px 0 12px;
+  text-align: center;
+  color: #22c55e;
+  font-weight: 600;
+}
+
+/* ================= LESSON FORM ================= */
+.lesson-form {
+  margin-top: 28px;
+  background: rgba(17, 24, 39, 0.95);
+  padding: 28px;
+  border-radius: 20px;
+  display: grid;
+  gap: 16px;
+  max-width: 720px;
+}
+.resume-btn {
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 12px 22px;
+  background: linear-gradient(135deg, #3ddc84, #2ecc71);
+  color: #0b1a16;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(61, 220, 132, 0.35);
+  transition: all 0.25s ease;
+}
+
+.resume-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 40px rgba(61, 220, 132, 0.55);
+}
+
+.lesson-form input,
+.lesson-form textarea {
+  background: #020617;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 14px 16px;
+  color: #e5e7eb;
+  font-size: 0.95rem;
+}
+
+.lesson-form textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.lesson-form input:focus,
+.lesson-form textarea:focus {
+  outline: none;
+  border-color: #22c55e;
+}
+
+.lesson-form button {
+  justify-self: flex-end;
+  background: #22c55e;
+  color: #022c22;
+  border: none;
+  padding: 12px 24px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.lesson-form button:hover {
+  background: #16a34a;
+}
+
+/* ================= LESSON SECTION ================= */
+.lesson-section {
+  margin-top: 52px;
+}
+
+.lesson-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 26px;
+}
+
+/* ================= LESSON LIST ================= */
+.lesson-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ================= LESSON CARD ================= */
+.lesson-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+  padding: 26px 30px;
+  background: linear-gradient(
+    145deg,
+    rgba(17, 24, 39, 0.92),
+    rgba(2, 6, 23, 0.92)
+  );
+  border-radius: 22px;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.lesson-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.45);
+}
+
+/* ================= LESSON INDEX ================= */
+.lesson-index {
+  min-width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #22c55e;
+  color: #022c22;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+/* ================= LESSON INFO ================= */
+.lesson-info h4 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.lesson-info p {
+  margin: 8px 0 10px;
+  color: #9ca3af;
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 900px;
+}
+
+.lesson-duration {
+  font-size: 0.9rem;
+  color: #22c55e;
+  font-weight: 500;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 900px) {
+  .course-detail-container {
+    padding: 36px 20px 80px;
+  }
+
+  .course-header {
+    padding: 28px;
+  }
+
+  .lesson-card {
+    padding: 20px;
+  }
+}
+
+.course-progress {
+  margin: 20px 0 10px;
+}
+
+.progress-label {
+  font-size: 0.9rem;
+  color: #cfd8dc;
+  margin-bottom: 6px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3ddc84, #2ecc71);
+  border-radius: 8px;
+  transition: width 0.4s ease;
+}
+
+.resume-btn {
+  background: linear-gradient(135deg, #3ddc84, #2ecc71);
+  color: #0e1b1f;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-bottom: 18px;
+  box-shadow: 0 6px 18px rgba(61, 220, 132, 0.35);
+}
+
+.resume-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(61, 220, 132, 0.5);
+}
+.lesson-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.lesson-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.lesson-card:hover {
+  transform: translateY(-2px);
+  background: rgba(0, 0, 0, 0.6);
+}
+.lesson-index {
+  min-width: 36px;
+  height: 36px;
+  background: #3ddc84;
+  color: #0e1b1f;
+  font-weight: 700;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+.lesson-info h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: #ffffff;
+}
+
+.lesson-info p {
+  margin: 4px 0 6px;
+  font-size: 0.85rem;
+  color: #cfd8dc;
+}
+
+.lesson-duration {
+  font-size: 0.75rem;
+  color: #3ddc84;
+  font-weight: 600;
+}
+.creator-note {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: #3ddc84;
+  opacity: 0.85;
+}

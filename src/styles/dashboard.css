@@ -1,0 +1,270 @@
+/* =====================
+   GLOBAL RESET
+===================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  color: #ffffff;
+  background: radial-gradient(circle at top, #24444a, #0b1518 70%);
+  min-height: 100vh;
+}
+
+/* =====================
+   DASHBOARD WRAPPER
+===================== */
+.dashboard-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  padding: 40px 24px;
+}
+
+/* =====================
+   HEADER
+===================== */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.dashboard-header h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.username {
+  color: #3ddc84;
+}
+
+/* =====================
+   BUTTONS
+===================== */
+.logout-btn {
+  background: #3ddc84;
+  color: #000;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.logout-btn:hover {
+  background: #2fbf73;
+  transform: translateY(-2px);
+}
+
+/* =====================
+   SECTIONS
+===================== */
+.dashboard-section {
+  background: linear-gradient(145deg, #162a2e, #0e1b1f);
+  padding: 32px;
+  border-radius: 22px;
+  margin-bottom: 40px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+}
+
+.dashboard-section h3 {
+  font-size: 1.4rem;
+  margin-bottom: 22px;
+}
+
+.dashboard-section-2 {
+  background: linear-gradient(145deg, #162a2e, #0e1b1f);
+  padding: 32px;
+  max-width: 50%;
+  border-radius: 22px;
+  margin-bottom: 40px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+}
+
+.dashboard-section-2 h3 {
+  font-size: 1.4rem;
+  margin-bottom: 22px;
+}
+
+/* =====================
+   CREATE COURSE
+===================== */
+.course-form-card {
+  background: linear-gradient(145deg, #1b1b1b, #101010);
+  padding: 32px;
+  border-radius: 20px;
+}
+
+.create-course-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.create-course-form input,
+.create-course-form textarea,
+.create-course-form select {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  background: #f4f7fb;
+  color: #000;
+}
+
+.create-course-form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.create-course-form button {
+  margin-top: 8px;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: #3ddc84;
+  color: #000;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.create-course-form button:hover {
+  background: #2fbf73;
+  transform: translateY(-2px);
+}
+
+/* =====================
+   COURSE GRID
+===================== */
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 26px;
+}
+
+/* =====================
+   COURSE CARD
+===================== */
+.course-card {
+  background: linear-gradient(145deg, #1e1e1e, #121212);
+  padding: 22px;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.45);
+  transition: transform 0.2s ease;
+}
+
+.course-card:hover {
+  transform: translateY(-6px);
+}
+
+.course-card h4 {
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+
+.course-card p {
+  font-size: 0.9rem;
+  color: #d6d6d6;
+  margin-bottom: 10px;
+}
+
+/* =====================
+   COURSE META
+===================== */
+.course-meta {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.badge {
+  background: #2b2b2b;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
+
+.level {
+  background: #3ddc84;
+  color: #000;
+}
+
+.course-author {
+  font-size: 0.75rem;
+  color: #aaaaaa;
+}
+
+/* =====================
+   AUTH PAGES (LOGIN / REGISTER)
+===================== */
+.auth-layout {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-card {
+  background: linear-gradient(145deg, #1c1c1c, #111111);
+  padding: 36px;
+  border-radius: 22px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+
+.auth-card h2 {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-card input {
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  font-size: 15px;
+}
+
+.auth-card button {
+  margin-top: 6px;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: #3ddc84;
+  color: #000;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 0.85rem;
+}
+
+.auth-footer span {
+  color: #3ddc84;
+  cursor: pointer;
+  font-weight: 600;
+}
+.error-text {
+  color: #ff6b6b;
+  font-size: 14px;
+  margin-top: 8px;
+}
