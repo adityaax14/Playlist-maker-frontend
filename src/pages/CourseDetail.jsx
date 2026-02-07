@@ -5,7 +5,8 @@ import { getCourseById } from "../api/course.js";
 import "../styles/CourseDetails.css";
 import { useAuth } from "../context/AuthContext";
 import { addLesson } from "../api/course";
-import { fetchCourseProgress } from "../api/progress.js";
+import { fetchCourseProgress,fetchCourseAnalytics } from "../api/progress.js";
+import CourseAnalytics from "../components/CourseAnalytics.jsx";
 
 export default function CourseDetail() {
   const { courseId } = useParams();
@@ -44,6 +45,35 @@ useEffect(() => {
     .then(res => setProgress(res.data));
 }, [courseId]);
 
+const [analytics, setAnalytics] = useState(null);
+
+useEffect(() => {
+  fetchCourseAnalytics(courseId)
+    .then(res => setAnalytics(res.data))
+    .catch(err => console.error(err));
+}, [courseId]);
+
+const getResumeLessonId = () => {
+  if (!course || !progress) return null;
+
+  
+  if (progress.inProgressLesson) {
+    return progress.inProgressLesson;
+  }
+
+ 
+  const completedSet = new Set(
+    progress.completedLessons?.map(id => id.toString())
+  );
+
+  const firstIncomplete = course.lessons.find(
+    lesson => !completedSet.has(lesson._id.toString())
+  );
+
+  return firstIncomplete?._id || null;
+};
+
+const resumeLessonId=getResumeLessonId();
 
 
 
@@ -90,132 +120,187 @@ const isInProgress = (lessonId) =>
     }
   };
 
+  const isCourseCompleted =
+  course.lessons.length > 0 &&
+  progress?.completedLessons?.length === course.lessons.length;
+
   
 
 
 
   return (
+   
     <AuthLayout>
-      <div className="course-detail-container">
-        {/* Course Header */}
-        <div className="course-header">
-          <h1>{course.title}</h1>
-          {isCreator && (
-  <button
-    className="add-lesson-btn"
-    onClick={() => setShowLessonForm(!showLessonForm)}
-  >
-    {showLessonForm ? "Cancel" : "Add Lesson"}
-  </button>
-  
-)}
-{showLessonForm && (
-  <div className="lesson-form">
-    <input
-      placeholder="Lesson title"
-      value={lessonForm.title}
-      onChange={(e) =>
-        setLessonForm({ ...lessonForm, title: e.target.value })
-      }
-    />
+  <div className="course-detail-container">
+    <button
+  className="back-courses-btn"
+  onClick={() => navigate("/dashboard")}
+>
+  ← Back to Courses
+</button>
 
-    <textarea
-      placeholder="Lesson description"
-      value={lessonForm.description}
-      onChange={(e) =>
-        setLessonForm({ ...lessonForm, description: e.target.value })
-      }
-    />
+    {/* Course Header */}
+    <div className="course-header">
+      <h1>{course.title}</h1>
 
-    <input
-      type="number"
-      placeholder="Duration (minutes)"
-      value={lessonForm.duration}
-      onChange={(e) =>
-        setLessonForm({ ...lessonForm, duration: e.target.value })
-      }
-    />
-
-    <input
-      placeholder="Video URL"
-      value={lessonForm.videoUrl}
-      onChange={(e) =>
-        setLessonForm({ ...lessonForm, videoUrl: e.target.value })
-      }
-    />
-
-    <button onClick={handleAddLesson}>
-      Save Lesson
-    </button>
-  </div>
-)}
- <div className="course-progress">
-  <div className="progress-label">
-    Progress: {progressPercent}%
-  </div>
-
-  <div className="progress-bar">
-    <div
-      className="progress-fill"
-      style={{ width: `${progressPercent}%` }}
-    />
-  </div>
-</div>
-
-
-          <p className="course-desc">{course.description}</p>
-          <span className="course-creator">
-            Created by {course.creator?.username}
-          </span>
-        </div>
-
+      {isCreator && (
+        <button
+          className="add-lesson-btn"
+          onClick={() => setShowLessonForm(!showLessonForm)}
+        >
+          {showLessonForm ? "Cancel" : "Add Lesson"}
+        </button>
+        
+        
+      )}
       
-        {isCreator && (
-          <p className="creator-note">You are the course creator</p>
-        )}
+         {isCreator && (
+       
+        <button
+  className="analytics-btn"
+  onClick={() => navigate(`/progress/creator/${course._id}/analytics`)}
+>
+  📊 View Analytics
+</button>
 
-        {/* Lessons */}
+        
+      
+        
+        
+      )}
+
+      <p className="course-desc">{course.description}</p>
+      <span className="course-creator">
+        Created by {course.creator?.username}
+      </span>
+    </div>
+    {isCourseCompleted && (
+  <div className="course-complete-banner">
+    🎉 Course Completed
+  </div>
+)}
+
+    
+{resumeLessonId && (
+  <button
+    className="resume-btn"
+    onClick={() =>
+      navigate(`/course/${course._id}/lesson/${resumeLessonId}`)
+    }
+  >
+    Resume Learning
+  </button>
+)}
+
+
+    {/* MOVE FORM OUTSIDE HEADER */}
+    {showLessonForm && (
+      <div className="lesson-form">
+        <input
+          placeholder="Lesson title"
+          value={lessonForm.title}
+          onChange={(e) =>
+            setLessonForm({ ...lessonForm, title: e.target.value })
+          }
+        />
+
+        <textarea
+          placeholder="Lesson description"
+          value={lessonForm.description}
+          onChange={(e) =>
+            setLessonForm({
+              ...lessonForm,
+              description: e.target.value
+            })
+          }
+        />
+
+        <input
+          type="number"
+          placeholder="Duration (minutes)"
+          value={lessonForm.duration}
+          onChange={(e) =>
+            setLessonForm({
+              ...lessonForm,
+              duration: e.target.value
+            })
+          }
+        />
+
+        <input
+          placeholder="Video URL"
+          value={lessonForm.videoUrl}
+          onChange={(e) =>
+            setLessonForm({
+              ...lessonForm,
+              videoUrl: e.target.value
+            })
+          }
+        />
+
+        <button onClick={handleAddLesson}>
+          Save Lesson
+        </button>
+      </div>
+    )}
+
+    {isCreator && (
+      <p className="creator-note">
+        You are the course creator
+      </p>
+    )}
+
+    {/* MAIN LAYOUT */}
+    <div className="course-main">
+      {/* Left: Analytics */}
+      {analytics && (
+        <div className="course-left">
+          <CourseAnalytics
+            analytics={analytics}
+            courseId={courseId}
+          />
+        </div>
+      )}
+
+      {/* Right: Lessons */}
+      <div className="course-right">
         <div className="lesson-section">
           <h2>Lessons</h2>
-           {progress?.inProgressLesson && (
-    <button
-      className="resume-btn"
-      onClick={() =>
-        navigate(
-          `/course/${course._id}/lesson/${progress.inProgressLesson}`
-        )
-      }
-    >
-      Resume Learning
-    </button>
-  )}
 
           {!course.lessons || course.lessons.length === 0 ? (
-           <div className="empty-lessons">
-  <p>No lessons yet</p>
-  {isCreator && <span>Add your first lesson to get started</span>}
-</div>
-
+            <div className="empty-lessons">
+              <p>No lessons yet</p>
+              {isCreator && (
+                <span>
+                  Add your first lesson to get started
+                </span>
+              )}
+            </div>
           ) : (
-            
             <div className="lesson-list">
               {course.lessons.map((lesson, index) => (
                 <div
-                 key={lesson._id}
+                  key={lesson._id}
                   className={`lesson-card
-                 ${isCompleted(lesson._id) ? "completed" : ""}
-                  ${isInProgress(lesson._id) ? "in-progress" : ""}
-                `}
-                onClick={() => navigate( `/course/${course._id}/lesson/${lesson._id}` ) }
-                
-               >
-                <div className="lesson-status">
-                {isCompleted(lesson._id) && "Completed"}
-                {!isCompleted(lesson._id) && isInProgress(lesson._id) && "In Progress"}
-                </div>
+                    ${isCompleted(lesson._id) ? "completed" : ""}
+                    ${isInProgress(lesson._id) ? "in-progress" : ""}
+                  `}
+                  onClick={() =>
+                    navigate(
+                      `/course/${course._id}/lesson/${lesson._id}`
+                    )
+                  }
+                >
+                  <div className="lesson-status">
+                    {isCompleted(lesson._id) && "Completed"}
+                    {!isCompleted(lesson._id) &&
+                      isInProgress(lesson._id) &&
+                      "In Progress"}
+                  </div>
 
-
-                  <div className="lesson-index">{index + 1}</div>
+                  <div className="lesson-index">
+                    {index + 1}
+                  </div>
 
                   <div className="lesson-info">
                     <h4>{lesson.title}</h4>
@@ -233,6 +318,11 @@ const isInProgress = (lessonId) =>
           )}
         </div>
       </div>
-    </AuthLayout>
+    </div>
+
+  </div>
+</AuthLayout>
   );
-}
+    
+  
+};

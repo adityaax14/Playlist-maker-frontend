@@ -6,6 +6,7 @@ import { useAuth } from "./context/AuthContext.jsx";
 import React from "react";
 import CourseDetail from "./pages/CourseDetail";
 import LessonViewer from "./pages/LessonViewer.jsx";
+import CreatorAnalytics from "./pages/CreatorAnalytics.jsx";
 
 
 
@@ -50,6 +51,14 @@ export default function App() {
   element={
     <ProtectedRoute>
       <LessonViewer />
+    </ProtectedRoute>
+  }
+/>
+ <Route
+  path="/progress/creator/:courseId/analytics"
+  element={
+    <ProtectedRoute>
+      <CreatorAnalytics />
     </ProtectedRoute>
   }
 />

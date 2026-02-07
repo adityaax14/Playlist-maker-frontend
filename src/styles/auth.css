@@ -176,3 +176,150 @@
   color: #c0392b;
   font-size: 20px;
 }
+
+/* Page background */
+.login-page {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  font-family: "Inter", sans-serif;
+}
+
+/* Main container */
+.login-container {
+  display: flex;
+  width: 860px;
+  height: 500px;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+}
+
+/* Left panel */
+.login-left {
+  flex: 1;
+  background: #f8f9fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 50px;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 340px;
+}
+
+/* Branding */
+.brand {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2b6cb0;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+}
+
+/* Headings */
+.auth-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.auth-subtitle {
+  font-size: 14px;
+  color: #777;
+  margin-bottom: 28px;
+}
+
+/* Form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-form input {
+  padding: 13px 15px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.auth-form input:focus {
+  border-color: #43cea2;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(67, 206, 162, 0.15);
+}
+
+/* Button */
+.auth-form button {
+  margin-top: 10px;
+  padding: 13px;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(to right, #43cea2, #185a9d);
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.auth-form button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(24, 90, 157, 0.3);
+}
+
+/* Right panel */
+.login-right {
+  flex: 1;
+  background: linear-gradient(135deg, #43cea2, #185a9d);
+  color: white;
+  padding: 60px 45px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.login-right h2 {
+  font-size: 32px;
+  margin-bottom: 15px;
+}
+
+.login-right p {
+  font-size: 15px;
+  margin-bottom: 30px;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+/* Sign up button */
+.signup-btn {
+  padding: 13px 28px;
+  border-radius: 30px;
+  border: none;
+  background: white;
+  color: #185a9d;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.signup-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* Error */
+.error-text {
+  margin-top: 12px;
+  color: #e53935;
+  font-size: 14px;
+}

@@ -4,7 +4,8 @@ import AuthLayout from "../components/AuthLayout.jsx";
 import { loginUser } from "../api/auth.js";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-import "../styles/dashboard.css";
+
+import "../styles/auth.css";
 
 export default function Login() {
   const [form, setForm] = useState({
@@ -46,43 +47,63 @@ export default function Login() {
   };
 
   return (
-    <AuthLayout>
-      <div className="auth-card">
-        <h2 className="auth-title">Login</h2>
+  <div className="login-page">
+    <div className="login-container">
+      
+      {/* LEFT SIDE */}
+     <div className="login-left">
+      <h1 className="brand">Learning Hub</h1>
+  <div className="login-box">
+    <h2 className="auth-title">Welcome Back</h2>
+    <p className="auth-subtitle">
+      Login to continue your learning journey
+    </p>
 
-        <form
-          onSubmit={handleSubmit}
-          className="auth-form"
-          autoComplete="off"
-        >
-          <input
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={handleChange}
-            placeholder="Email"
-            autoComplete="email"
-          />
+    <form
+      onSubmit={handleSubmit}
+      className="auth-form"
+      autoComplete="off"
+    >
+      <input
+        name="email"
+        type="email"
+        value={form.email}
+        onChange={handleChange}
+        placeholder="Email"
+        autoComplete="email"
+      />
 
-          <input
-            name="password"
-            type="password"
-            value={form.password}
-            onChange={handleChange}
-            placeholder="Password"
-            autoComplete="new-password"
-          />
+      <input
+        name="password"
+        type="password"
+        value={form.password}
+        onChange={handleChange}
+        placeholder="Password"
+        autoComplete="new-password"
+      />
 
-          <button type="submit">Login</button>
-        </form>
+      <button type="submit">Sign In</button>
+    </form>
 
-        {error && <p className="error-text">{error}</p>}
+    {error && <p className="error-text">{error}</p>}
+  </div>
+</div>
 
-        <p className="auth-footer">
-          Don’t have an account?{" "}
-          <span onClick={() => navigate("/register")}>Register</span>
+      {/* RIGHT SIDE */}
+      <div className="login-right">
+        <h2>New Here?</h2>
+        <p>
+          Sign up and start tracking your learning journey with
+          the Learning Hub.
         </p>
+        <button
+          className="signup-btn"
+          onClick={() => navigate("/register")}
+        >
+          Sign Up
+        </button>
       </div>
-    </AuthLayout>
-  );
+    </div>
+  </div>
+);
 }
