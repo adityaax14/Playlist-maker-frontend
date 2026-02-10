@@ -18,72 +18,85 @@ export default function CreatorAnalytics() {
       .catch(console.error);
   }, [courseId]);
 
-  if (!data) return <p className="loading-text">Loading analytics...</p>;
+  if (!data) return <div className="loading-container"><p className="loading-text">Loading analytics...</p></div>;
 
   return (
-    <AuthLayout>
-  <div className="analytics-page">
-    <div className="analytics-wrapper">
+  <AuthLayout>
+    <div className="analytics-page">
+      <div className="analytics-container">
 
-      {/* PAGE HEADER */}
-      <div className="analytics-header">
-        <h1>Course Analytics</h1>
-        <p>Track learner progress and engagement</p>
-      </div>
-
-      {/* SUMMARY CARDS */}
-      <div className="analytics-cards">
-        <div className="stat-card">
-          <span className="stat-label">Total Learners</span>
-          <h2>{data.totalLearners}</h2>
+        {/* HEADER */}
+        <div className="analytics-header">
+          <h1>Course Analytics</h1>
+          <p>Track learner progress and engagement</p>
         </div>
 
-        <div className="stat-card">
-          <span className="stat-label">Completed</span>
-          <h2>{data.completedLearners}</h2>
+        {/* STAT CARDS */}
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-icon">
+              👥
+            </div>
+            <p className="stat-label">Total Learners</p>
+            <h2 className="stat-value">{data.totalLearners}</h2>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-icon">
+              ✅
+            </div>
+            <p className="stat-label">Completed</p>
+            <h2 className="stat-value">{data.completedLearners}</h2>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-icon">
+              📈
+            </div>
+            <p className="stat-label">Completion Rate</p>
+            <h2 className="stat-value">{data.completionRate}%</h2>
+          </div>
         </div>
 
-        <div className="stat-card">
-          <span className="stat-label">Completion Rate</span>
-          <h2>{data.completionRate}%</h2>
-        </div>
-      </div>
-
-      {/* CHART GRID */}
-      <div className="charts-grid">
-
-        {/* BAR CHART */}
+        {/* LESSON ENGAGEMENT CHART */}
         <div className="chart-card">
           <h3>Lesson Engagement</h3>
           <p className="chart-sub">Time spent per lesson</p>
 
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={250}>
             <BarChart data={data.lessonTimeStats}>
               <XAxis dataKey="lessonTitle" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="totalTime" fill="#3ddc84" radius={[6,6,0,0]} />
+              <Bar
+                dataKey="totalTime"
+                fill="#34d399"
+                radius={[8, 8, 0, 0]}
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
-        {/* LINE CHART */}
+        {/* DAILY ACTIVE LEARNERS */}
         <div className="chart-card">
           <h3>Daily Active Learners</h3>
           <p className="chart-sub">User activity over time</p>
 
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={220}>
             <LineChart data={data.dailyActivity}>
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid
+                strokeDasharray="4 4"
+                stroke="#1e3a45"
+              />
               <XAxis dataKey="_id" />
               <YAxis />
               <Tooltip />
               <Line
                 type="monotone"
                 dataKey="activeUsers"
-                stroke="#3ddc84"
-                strokeWidth={3}
-                dot={{ r: 4 }}
+                stroke="#34d399"
+                strokeWidth={2.5}
+                dot={{ r: 5 }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -91,7 +104,7 @@ export default function CreatorAnalytics() {
 
       </div>
     </div>
-  </div>
-</AuthLayout>
-  );
+  </AuthLayout>
+);
+  
 }

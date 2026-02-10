@@ -1,160 +1,211 @@
 /* Background */
+/* RESET & VARIABLES */
+:root {
+  --apple-bg: #000000; /* Pure OLED Black */
+  --apple-surface: #1c1c1e; /* System Gray 6 */
+  --apple-blue: #0A84FF; /* iOS System Blue Dark Mode */
+  --apple-text-primary: #FFFFFF;
+  --apple-text-secondary: #8E8E93; /* System Gray */
+  --apple-text-tertiary: #48484A;
+  --apple-glass: rgba(28, 28, 30, 0.75);
+}
+
 body {
+  background-color: var(--apple-bg);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--apple-text-primary);
   margin: 0;
-  background: #050b0e;
+  -webkit-font-smoothing: antialiased;
 }
-.lesson-wrapper {
+
+/* CONTAINER LAYOUT */
+.apple-page-container {
   min-height: 100vh;
-  width: 100%;
-  background: radial-gradient(circle at 20% 30%, #0b3b3b, #071a1f 60%, #050b0e);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #e7f7f7;
-}
-
-/* Main container */
-.lesson-container {
-  width: 100%;
-  max-width: 1400px; /* increased */
-  padding: 80px 80px; /* inner spacing instead of outer */
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 80px;
-  align-items: center;
-}
-
-/* LEFT PANEL */
-.lesson-left {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  background-color: var(--apple-bg);
 }
 
-.lesson-badge {
-  background: rgba(0, 255, 200, 0.15);
-  color: #3fffd8;
-  padding: 6px 14px;
-  border-radius: 999px;
-  width: fit-content;
-  font-size: 14px;
-}
-
-.lesson-title {
-  font-size: 52px;
-  font-weight: 700;
-  line-height: 1.1;
-}
-
-.lesson-description {
-  font-size: 18px;
-  color: #9cc7c7;
-  max-width: 520px;
-}
-
-.lesson-time {
-  margin-top: 10px;
-  background: rgba(0, 255, 200, 0.12);
-  padding: 8px 14px;
-  border-radius: 999px;
-  width: fit-content;
-  font-size: 14px;
-}
-
-/* Complete button */
-.complete-btn {
-  margin-top: 30px;
-  background: linear-gradient(135deg, #22e3b4, #3ac7ff);
-  border: none;
-  color: #022b2b;
-  font-weight: 600;
-  padding: 16px 32px;
-  border-radius: 40px;
-  font-size: 18px;
-  cursor: pointer;
-  transition: 0.25s ease;
-  width: fit-content;
-}
-
-.complete-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(0, 255, 200, 0.25);
-}
-
-/* RIGHT PANEL */
-.lesson-right {
+/* 1. GLASSMORPHIC HEADER */
+.apple-nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
-  justify-content: center;
-}
-
-/* Video card */
-.video-card {
-  width: 100%;
-  max-width: 520px;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 20px;
-  padding: 24px;
+  align-items: center;
+  height: 60px;
+  padding: 0 40px;
+  background-color: var(--apple-glass);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.lesson-video {
-  width: 100%;
-  border-radius: 14px;
-  background: black;
-}
-
-/* Navigation */
-.lesson-navigation {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-}
-
-.nav-btn {
-  padding: 12px 26px;
-  border-radius: 999px;
-  font-size: 15px;
-  cursor: pointer;
+.apple-back-btn {
+  background: none;
   border: none;
-  transition: 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--apple-blue);
+  font-size: 17px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: opacity 0.2s;
 }
 
-.nav-btn.secondary {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #c7dcdc;
+.apple-back-btn:hover {
+  opacity: 0.7;
 }
 
-.nav-btn.primary {
-  background: linear-gradient(135deg, #22e3b4, #3ac7ff);
-  color: #022b2b;
+/* 2. MAIN GRID */
+.apple-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr; /* Text | Video */
+  gap: 80px;
+  padding: 60px 80px;
+  max-width: 1400px;
+  margin: 0 auto;
+  align-items: center;
 }
 
-.nav-btn:hover {
-  transform: translateY(-1px);
+/* 3. LEFT PANEL TYPOGRAPHY */
+.apple-text-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.apple-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.apple-badge {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--apple-text-secondary);
+  border: 1px solid var(--apple-text-tertiary);
+  padding: 4px 10px;
+  border-radius: 100px;
+}
+
+.apple-meta-text {
+  font-size: 14px;
+  color: var(--apple-text-secondary);
+  font-weight: 500;
+}
+
+.apple-title {
+  font-size: 48px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin: 0;
+  background: linear-gradient(180deg, #fff 0%, #e5e5e5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.apple-description {
+  font-size: 19px;
+  line-height: 1.5;
+  color: var(--apple-text-secondary);
+  margin: 0;
+  max-width: 90%;
+}
+
+/* 4. PRIMARY ACTION BUTTON */
+.apple-primary-btn {
+  margin-top: 16px;
+  background-color: #FFFFFF;
+  color: #000000;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 100px; /* Pill shape */
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+  width: fit-content;
+}
+
+.apple-primary-btn:hover {
+  transform: scale(1.03);
+}
+
+.apple-primary-btn:active {
+  transform: scale(0.97);
   opacity: 0.9;
 }
 
-/* Responsive */
-@media (max-width: 900px) {
-  .lesson-container {
+/* 5. RIGHT PANEL (VIDEO) */
+.apple-video-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5); /* Deep ambient shadow */
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.08); /* Subtle border */
+}
+
+.apple-video-player {
+  width: 100%;
+  height: auto;
+  display: block;
+  aspect-ratio: 16 / 9;
+}
+
+/* 6. BOTTOM NAVIGATION (Simple text links) */
+.apple-video-nav {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+}
+
+.apple-nav-link {
+  background: none;
+  border: none;
+  color: var(--apple-blue);
+  font-size: 17px;
+  cursor: pointer;
+  padding: 0;
+  font-weight: 500;
+}
+
+.apple-nav-link.disabled {
+  color: var(--apple-text-tertiary);
+  cursor: default;
+}
+
+.apple-divider {
+  width: 1px;
+  height: 16px;
+  background-color: var(--apple-text-tertiary);
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .apple-content-grid {
     grid-template-columns: 1fr;
     gap: 40px;
-    text-align: center;
+    padding: 40px 24px;
+  }
+  
+  .apple-nav-bar {
+    padding: 0 24px;
   }
 
-  .lesson-left {
-    align-items: center;
-  }
-
-  .lesson-description {
-    max-width: 100%;
-  }
-
-  .lesson-navigation {
-    justify-content: center;
-    gap: 16px;
+  .apple-title {
+    font-size: 36px;
   }
 }
