@@ -5,6 +5,7 @@ import { registerUser } from "../api/auth.js";
 import { useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout.jsx";
 import "../styles/dashboard.css";
+import "../styles/auth.css";
 
 
 
@@ -46,46 +47,75 @@ export default function Register() {
 
 
   return (
-    <AuthLayout>
-      <div className="auth-card">
-    <form onSubmit={handleSubmit}>
-      <h2>Register</h2>
-      <input
-  name="username"
-  value={form.username}
-  onChange={handleChange}
-  placeholder="Username"
-  required
-/>
+    
+  <div className="auth-container">
+    <div className="auth-card">
 
-<input
-  name="email"
-  type="email"
-  value={form.email}
-  onChange={handleChange}
-  placeholder="Email"
-  required
-/>
+      {/* LEFT SIDE */}
+      <div className="auth-left">
+        <h1 className="brand">Playlist Studio</h1>
 
-<input
-  name="password"
-  type="password"
-  value={form.password}
-  onChange={handleChange}
-  placeholder="Password"
-  required
-/>
+        <div className="login-box">
+          <h2 className="auth-title">Create Account</h2>
+          <p className="auth-subtitle">
+            Start building and exploring playlists
+          </p>
 
-     
-      <button type="submit">Register</button>
-       <p className="auth-footer">
-        Already have an account? <span onClick={() => navigate("/login")}>Login</span>
-      </p>
-      {error && <p className="error-text">{error}</p>}
-      {text && <p className="success-text">{text}</p>}
+          <form
+            onSubmit={handleSubmit}
+            className="auth-form"
+            autoComplete="off"
+          >
+            <input
+              name="username"
+              type="text"
+              value={form.username}
+              onChange={handleChange}
+              placeholder="Username"
+            />
 
-    </form>
+            <input
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="Email"
+            />
+
+            <input
+              name="password"
+              type="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="Password"
+            />
+
+            <button type="submit" className="primary-btn">
+              Register
+            </button>
+          </form>
+
+          {error && <p className="error-text">{error}</p>}
+        </div>
+      </div>
+
+      {/* RIGHT SIDE */}
+      <div className="auth-right">
+        <h2>Already have an account?</h2>
+        <p>
+          Sign in to continue building your learning playlists.
+        </p>
+
+        <button
+          className="secondary-btn"
+          onClick={() => navigate("/login")}
+        >
+          Sign In
+        </button>
+      </div>
+
     </div>
-    </AuthLayout>
-  );
+  </div>
+);
+  
 }

@@ -1,0 +1,155 @@
+/* ================= CONTAINER ================= */
+
+.explore-container {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #0f1f2e, #08131d);
+  padding: 60px 70px;
+  font-family: "Inter", sans-serif;
+  color: #e6edf3;
+}
+
+.explore-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ================= HEADER ================= */
+
+.explore-header h1 {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+.explore-header span {
+  background: linear-gradient(135deg, #2de1c2, #18a8ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ================= SEARCH ================= */
+
+.search-bar {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 50px;
+}
+
+.search-bar input {
+  flex: 1;
+  max-width: 520px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  border: none;
+  background: #1b2633;
+  color: white;
+  font-size: 15px;
+}
+
+.search-bar input::placeholder {
+  color: #7f93a6;
+}
+
+.search-bar button {
+  background: linear-gradient(135deg, #27e1c1, #13b4b4);
+  border: none;
+  padding: 16px 28px;
+  border-radius: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #002e2a;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: 0.2s;
+}
+
+.search-bar button:hover {
+  transform: translateY(-1px);
+}
+
+/* ================= SECTIONS ================= */
+
+section {
+  margin-bottom: 70px;
+}
+
+section h2 {
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 22px;
+}
+
+/* ================= GRID ================= */
+
+.explore-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px;
+}
+
+/* ================= CARD ================= */
+
+.explore-card {
+  background: linear-gradient(160deg, #111f2c, #0c1a25);
+  padding: 26px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.explore-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(45, 225, 194, 0.25);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.explore-card h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.explore-card p {
+  font-size: 14px;
+  color: #8aa0b2;
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+
+/* ================= META ================= */
+
+.meta {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: #7d93a5;
+  align-items: center;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 1000px) {
+  .explore-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .explore-container {
+    padding: 40px 20px;
+  }
+
+  .explore-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .search-bar {
+    flex-direction: column;
+  }
+
+  .search-bar input {
+    max-width: 100%;
+  }
+}
