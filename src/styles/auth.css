@@ -1,168 +1,258 @@
-/* ================= CONTAINER ================= */
-
-.auth-container {
+/* Layout */
+.auth-wrapper {
+  display: flex;
   min-height: 100vh;
-  background: radial-gradient(circle at top, #0f1f2e, #08131d);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
-/* ================= CARD ================= */
-
-.auth-card {
-  width: 900px;
-  height: 480px;
-  background: #0c1b26;
-  border-radius: 20px;
-  display: flex;
-  overflow: hidden;
-  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
-}
-
-/* ================= LEFT SIDE ================= */
-
-.auth-left {
-  width: 50%;
-  padding: 60px 50px;
-  background: linear-gradient(160deg, #122531, #0c1b26);
+/* LEFT HERO */
+.auth-hero {
+  flex: 1;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: white;
+  padding: 80px;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
-.brand {
-  font-size: 28px;
-  color: #2de1c2;
-  margin-bottom: 20px;
+.auth-hero h1 {
+  font-size: 48px;
   font-weight: 700;
+  margin-bottom: 20px;
 }
 
-.login-box {
-  width: 100%;
+.auth-hero h1 span {
+  color: #ff5722;
 }
 
-.auth-title {
-  font-size: 26px;
-  margin-bottom: 8px;
+.auth-hero p {
+  font-size: 18px;
+  opacity: 0.8;
+  max-width: 450px;
+  line-height: 1.6;
 }
 
-.auth-subtitle {
-  color: #8aa0b2;
-  font-size: 14px;
-  margin-bottom: 28px;
+.hero-features {
+  margin-top: 40px;
+  display: grid;
+  gap: 15px;
+  font-size: 15px;
+  opacity: 0.9;
 }
 
-/* ================= FORM ================= */
+/* RIGHT PANEL */
+.auth-panel {
+  flex: 1;
+  background: #f8fafc;
+  padding: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.auth-tabs {
+  display: flex;
+  margin-bottom: 30px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.auth-tabs button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.auth-tabs .active {
+  background: white;
+  border-radius: 10px;
+}
+
+/* Form */
+.auth-panel h2 {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.panel-subtitle {
+  margin-bottom: 30px;
+  color: #64748b;
+}
 
 .auth-form {
   display: flex;
   flex-direction: column;
+  gap: 18px;
 }
 
-.auth-form input {
+.input-group input {
+  width: 100%;
   padding: 14px;
-  margin-bottom: 16px;
-  border-radius: 10px;
-  border: none;
-  background: #1c2c3a;
-  color: white;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
   font-size: 14px;
 }
 
-.auth-form input::placeholder {
-  color: #7d93a5;
+.input-group input:focus {
+  outline: none;
+  border-color: #ff5722;
 }
 
-/* ================= BUTTONS ================= */
-
 .primary-btn {
-  background: linear-gradient(135deg, #27e1c1, #13b4b4);
+  background: #ff5722;
   border: none;
   padding: 14px;
-  border-radius: 12px;
-  font-weight: 600;
+  border-radius: 8px;
+  color: white;
+  font-size: 15px;
   cursor: pointer;
-  color: #002e2a;
-  margin-top: 10px;
   transition: 0.2s ease;
 }
 
 .primary-btn:hover {
-  transform: translateY(-1px);
+  background: #e64a19;
 }
-
-/* ================= RIGHT SIDE ================= */
-
-.auth-right {
-  width: 50%;
-  background: linear-gradient(135deg, #27e1c1, #1e5c9a);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 40px;
-  text-align: center;
-}
-
-.auth-right h2 {
-  font-size: 32px;
-  margin-bottom: 12px;
-}
-
-.auth-right p {
-  font-size: 15px;
-  opacity: 0.9;
-  margin-bottom: 30px;
-  max-width: 260px;
-}
-
-/* Secondary button */
-
-.secondary-btn {
-  background: white;
-  color: #1e5c9a;
-  border: none;
-  padding: 14px 40px;
-  border-radius: 30px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.secondary-btn:hover {
-  transform: translateY(-1px);
-}
-
-/* ================= ERROR TEXT ================= */
 
 .error-text {
-  color: #ff5b5b;
-  margin-top: 12px;
+  color: red;
   font-size: 14px;
 }
 
-/* ================= RESPONSIVE ================= */
-
+/* Responsive */
 @media (max-width: 900px) {
-  .auth-card {
+  .auth-wrapper {
     flex-direction: column;
-    width: 90%;
-    height: auto;
   }
 
-  .auth-left,
-  .auth-right {
-    width: 100%;
+  .auth-hero {
+    padding: 40px;
   }
 
-  .auth-left {
-    padding: 40px 30px;
+  .auth-panel {
+    padding: 40px;
   }
+}
 
-  .auth-right {
-    padding: 40px 30px;
-  }
+.auth-hero {
+  flex: 1;
+  position: relative;
+  background: url("../assets/auth-hero-D2VHYNX1.jpg") center/cover no-repeat;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px;
+  color: white;
+  overflow: hidden;
+}
+
+/* Dark overlay for readability */
+.auth-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(10, 15, 25, 0.85),
+    rgba(15, 23, 42, 0.85)
+  );
+  z-index: 0;
+}
+
+/* Ensure content stays above overlay */
+.auth-hero > * {
+  position: relative;
+  z-index: 2;
+}
+
+.auth-hero h1 {
+  font-size: 56px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  line-height: 1.1;
+}
+
+.auth-hero h1 span {
+  color: #ff5722;
+}
+.auth-hero p {
+  font-size: 18px;
+  opacity: 0.85;
+  max-width: 500px;
+  line-height: 1.6;
+}
+.auth-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 70% 50%,
+    rgba(255, 87, 34, 0.25),
+    transparent 50%
+  );
+  z-index: 1;
+}
+
+.auth-panel h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #111827;   /* strong dark */
+  margin-bottom: 8px;
+}
+
+.panel-subtitle {
+  font-size: 14px;
+  color: #6b7280;  /* clean medium gray */
+  margin-bottom: 25px;
+}
+
+.forgot-link {
+  font-size: 13px;
+  color: #ff5a2f;   /* brand color */
+  cursor: pointer;
+  margin-top: 6px;
+  align-self: flex-end;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+  opacity: 0.9;
+}
+/* PASSWORD GROUP */
+.password-group {
+  position: relative;
+}
+
+.password-group input {
+  padding-right: 70px;
+}
+
+/* TOGGLE TEXT */
+.toggle-password {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  font-weight: 500;
+  color: #6366f1;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-password:hover {
+  text-decoration: underline;
+}
+
+/* ERROR TEXT */
+.error-text {
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: 6px;
 }

@@ -2,10 +2,12 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
-import Dashboard from "./pages/dashboard.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
 import { useAuth } from "./context/AuthContext.jsx";
 import Explore from "./pages/Explore.jsx";
 import PlaylistDetail from "./pages/PlaylistDetail.jsx";
+import ForgotPassword from "./pages/ForgotPassword.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
 
 
 
@@ -27,7 +29,7 @@ export default function App() {
 
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-
+      
       <Route
         path="/dashboard"
         element={
@@ -43,6 +45,8 @@ export default function App() {
       }
       />
       <Route path="/playlist/:playlistId/:videoId?" element={<PlaylistDetail />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       
 
     </Routes>

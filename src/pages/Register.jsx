@@ -1,121 +1,147 @@
-import React from "react";
-
-import { useState } from "react";
+import React, { useState } from "react";
 import { registerUser } from "../api/auth.js";
 import { useNavigate } from "react-router-dom";
-import AuthLayout from "../components/AuthLayout.jsx";
-import "../styles/dashboard.css";
 import "../styles/auth.css";
-
-
 
 export default function Register() {
   const [form, setForm] = useState({
     username: "",
     email: "",
-    password: ""
+    password: "",
+    confirmPassword: ""
   });
+
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-  const [error, setError] = useState("");
-  const [text,setText]=useState("");
-
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
-  setText("");
+    e.preventDefault();
+    setError("");
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (form.password !== form.confirmPassword) {
+      return setError("Passwords do not match");
+    }
 
-  if (!emailRegex.test(form.email)) {
-    setError("Please enter a valid email address");
-    return;
-  }
+    if (form.password.length < 6) {
+      return setError("Password must be at least 6 characters");
+    }
 
-  try {
-    const res = await registerUser(form);
-    setText("User registered successfully");
-    setForm({ username: "", email: "", password: "" });
-  } catch (err) {
-    setError(err.message || "Registration failed");
-  }
-};
+    try {
+      await registerUser({
+        username: form.username,
+        email: form.email,
+        password: form.password
+      });
 
+      navigate("/login");
+    } catch (err) {
+      setError(err.message || "Registration failed");
+    }
+  };
 
   return (
-    
-  <div className="auth-container">
-    <div className="auth-card">
+    <div className="auth-wrapper">
 
-      {/* LEFT SIDE */}
-      <div className="auth-left">
-        <h1 className="brand">Playlist Studio</h1>
+      {/* LEFT SECTION */}
+      <div className="auth-hero">
+        <h1>
+          Learn with <span>purpose.</span>
+        </h1>
 
-        <div className="login-box">
-          <h2 className="auth-title">Create Account</h2>
-          <p className="auth-subtitle">
-            Start building and exploring playlists
-          </p>
-
-          <form
-            onSubmit={handleSubmit}
-            className="auth-form"
-            autoComplete="off"
-          >
-            <input
-              name="username"
-              type="text"
-              value={form.username}
-              onChange={handleChange}
-              placeholder="Username"
-            />
-
-            <input
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="Email"
-            />
-
-            <input
-              name="password"
-              type="password"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="Password"
-            />
-
-            <button type="submit" className="primary-btn">
-              Register
-            </button>
-          </form>
-
-          {error && <p className="error-text">{error}</p>}
-        </div>
+        <p>
+          Organize YouTube videos into structured learning paths.
+          Track progress, share with others, and never lose your place.
+        </p>
       </div>
 
-      {/* RIGHT SIDE */}
-      <div className="auth-right">
-        <h2>Already have an account?</h2>
-        <p>
-          Sign in to continue building your learning playlists.
-        </p>
+      {/* RIGHT PANEL */}
+      <div className="auth-panel">
+        <div className="auth-tabs">
+          <button onClick={() => navigate("/login")}>
+            Sign In
+          </button>
+          <button className="active">
+            Create Account
+          </button>
+        </div>
 
-        <button
-          className="secondary-btn"
-          onClick={() => navigate("/login")}
-        >
-          Sign In
-        </button>
+        <h2>Create Account</h2>
+
+        <form onSubmit={handleSubmit} className="auth-form">
+
+          <div className="input-group">
+            <input
+              name="username"
+              placeholder="Username"
+              value={form.username}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="input-group">
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          {/* PASSWORD */}
+          <div className="input-group password-group">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+            <span
+              className="toggle-password"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </span>
+          </div>
+
+          {/* CONFIRM PASSWORD */}
+          <div className="input-group password-group">
+            <input
+              type={showConfirm ? "text" : "password"}
+              name="confirmPassword"
+              placeholder="Confirm Password"
+              value={form.confirmPassword}
+              onChange={handleChange}
+              required
+            />
+            <span
+              className="toggle-password"
+              onClick={() => setShowConfirm(!showConfirm)}
+            >
+              {showConfirm ? "Hide" : "Show"}
+            </span>
+          </div>
+
+          {error && <p className="error-text">{error}</p>}
+
+          <button type="submit" className="primary-btn">
+            Create Account →
+          </button>
+
+        </form>
       </div>
 
     </div>
-  </div>
-);
-  
+  );
 }

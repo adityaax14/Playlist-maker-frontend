@@ -1,40 +1,215 @@
 import React, { useEffect, useState } from "react";
-import AuthLayout from "../components/AuthLayout";
 import {
   fetchMyPlaylists,
   createPlaylist,
   updatePlaylist,
-  deletePlaylist
+  deletePlaylist,
+  getSavedPlaylists,
+  removeSavedPlaylist,
 } from "../api/playlist";
 import "../styles/dashboard.css";
 import { useNavigate } from "react-router-dom";
+import { logoutUser } from "../api/auth";
+import StarRating from "./StarRating.jsx";
 
+const TABS = ["My Playlists", "Saved"];
 
+/* ════════════════════════════════════════════════
+   SUB-COMPONENTS — all defined OUTSIDE Dashboard
+   so React never recreates them on re-render,
+   which would cause inputs to lose focus / remount.
+   ════════════════════════════════════════════════ */
 
+function FormPanel({ title, form, setForm, onSubmit, onClose, submitLabel }) {
+  return (
+    <div className="db-form slide-up">
+      <div className="db-form-header">
+        <h2>{title}</h2>
+        <button className="db-form-close" onClick={onClose}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+          </svg>
+        </button>
+      </div>
+      <input
+        placeholder="Playlist title"
+        value={form.title}
+        onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+      />
+      <textarea
+        placeholder="What's this playlist about?"
+        rows={3}
+        value={form.description}
+        onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+      />
+      <div className="db-vis-toggle">
+        <button
+          className={`db-vis-btn ${form.isPublic ? "active" : ""}`}
+          onClick={() => setForm((f) => ({ ...f, isPublic: true }))}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+            <path d="M2 12h20"/>
+          </svg>
+          Public
+        </button>
+        <button
+          className={`db-vis-btn ${!form.isPublic ? "active" : ""}`}
+          onClick={() => setForm((f) => ({ ...f, isPublic: false }))}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect width="18" height="11" x="3" y="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          Private
+        </button>
+      </div>
+      <button className="db-submit-btn" onClick={onSubmit}>{submitLabel}</button>
+    </div>
+  );
+}
+
+function PlaylistCard({ playlist, index, isSaved, onEdit, onDelete, onUnsave, onNavigate }) {
+  return (
+    <div
+      className="db-card fade-in"
+      style={{ animationDelay: `${index * 70}ms` }}
+      onClick={() => onNavigate(playlist._id)}
+    >
+      <div className="db-card-thumb">
+        <img
+          src={playlist.videos?.[0]?.thumbnailUrl || ""}
+          alt={playlist.title}
+          onError={(e) => { e.target.style.display = "none"; }}
+        />
+        {!playlist.videos?.[0]?.thumbnailUrl && (
+          <div className="db-card-thumb-empty">🎬</div>
+        )}
+        <div className="db-card-count">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 15V6"/><path d="M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/>
+            <path d="M12 12H3"/><path d="M16 6H3"/><path d="M12 18H3"/>
+          </svg>
+          {playlist.totalVideos || 0}
+        </div>
+        {isSaved ? (
+          <div className="db-card-saved-chip">Saved</div>
+        ) : (
+          <span className={`db-card-vis ${playlist.isPublic ? "public" : "private"}`}>
+            {playlist.isPublic ? "Public" : "Private"}
+          </span>
+        )}
+      </div>
+
+      <div className="db-card-body">
+        <h3 className="db-card-title">{playlist.title}</h3>
+        <p  className="db-card-desc">{playlist.description}</p>
+
+        {isSaved && playlist.creator && (
+          <div className="db-card-creator">
+            <div className="db-card-avatar">
+              {(playlist.creator.username || "U")[0].toUpperCase()}
+            </div>
+            <span>{playlist.creator.username}</span>
+          </div>
+        )}
+
+        <div className="db-card-stats">
+          <span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+            {(playlist.views || 0).toLocaleString()}
+          </span>
+        </div>
+
+        <div onClick={(e) => e.stopPropagation()}>
+          <StarRating
+            playlistId={playlist._id}
+            averageRating={playlist.averageRating}
+            ratingsCount={playlist.ratingsCount}
+            size="sm"
+          />
+        </div>
+
+        <div className="db-card-actions" onClick={(e) => e.stopPropagation()}>
+          {isSaved ? (
+            <button className="db-delete-btn db-unsave-btn" onClick={() => onUnsave(playlist._id)}>
+              Remove from Saved
+            </button>
+          ) : (
+            <>
+              <button className="db-edit-btn"   onClick={() => onEdit(playlist)}>Edit</button>
+              <button className="db-delete-btn" onClick={() => onDelete(playlist._id)}>Delete</button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Skeleton({ i }) {
+  return (
+    <div className="db-skeleton" style={{ animationDelay: `${i * 60}ms` }}>
+      <div className="sk-thumb" />
+      <div className="sk-body">
+        <div className="sk-line sk-title" />
+        <div className="sk-line sk-desc"  />
+        <div className="sk-line sk-short" />
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   DASHBOARD
+   ════════════════════════════════════════════════ */
 export default function Dashboard() {
-  const [playlists, setPlaylists] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ title: "", description: "", isPublic: true });
-  const [editingId, setEditingId] = useState(null);
+  const [playlists, setPlaylists]       = useState([]);
+  const [saved, setSaved]               = useState([]);
+  const [activeTab, setActiveTab]       = useState("My Playlists");
+  const [showForm, setShowForm]         = useState(false);
+  const [form, setForm]                 = useState({ title: "", description: "", isPublic: true });
+  const [editingId, setEditingId]       = useState(null);
+  const [loadingSaved, setLoadingSaved] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => { loadPlaylists(); }, []);
+  useEffect(() => {
+    loadPlaylists();
+    loadSaved(); // load on mount so stats bar count is correct immediately
+  }, []);
 
   const loadPlaylists = async () => {
     try {
       const res = await fetchMyPlaylists();
       setPlaylists(res.data.playlists || []);
-    } catch (err) { console.error("Failed to load playlists", err); setPlaylists([]); }
+    } catch (err) { console.error(err); setPlaylists([]); }
+  };
+
+  const loadSaved = async () => {
+    setLoadingSaved(true);
+    try {
+      const res = await getSavedPlaylists();
+      setSaved(res.data || []);
+    } catch (err) { console.error(err); setSaved([]); }
+    finally { setLoadingSaved(false); }
+  };
+
+  const handleLogout = async () => {
+    try { await logoutUser(); navigate("/login"); }
+    catch (err) { console.error(err); }
   };
 
   const handleCreate = async () => {
+    if (!form.title || !form.description) { alert("Title and description required"); return; }
     try {
-      if (!form.title || !form.description) { alert("Title and description required"); return; }
       const res = await createPlaylist(form);
       setPlaylists((prev) => [res.data, ...prev]);
       setForm({ title: "", description: "", isPublic: true });
       setShowForm(false);
-    } catch (err) { console.error("Create failed", err); alert("Failed to create playlist"); }
+    } catch (err) { console.error(err); alert("Failed to create playlist"); }
   };
 
   const handleUpdate = async (id) => {
@@ -42,187 +217,189 @@ export default function Dashboard() {
       const res = await updatePlaylist(id, form);
       setPlaylists((prev) => prev.map((p) => (p._id === id ? res.data : p)));
       setEditingId(null);
-    } catch (err) { console.error("Update failed", err); }
+    } catch (err) { console.error(err); }
   };
 
   const handleDelete = async (id) => {
     try {
       await deletePlaylist(id);
       setPlaylists((prev) => prev.filter((p) => p._id !== id));
-    } catch (err) { console.error("Delete failed", err); }
+    } catch (err) { console.error(err); }
   };
 
+  const handleUnsave = async (id) => {
+    try {
+      await removeSavedPlaylist(id);
+      setSaved((prev) => prev.filter((p) => p._id !== id));
+    } catch (err) { console.error(err); }
+  };
+
+  const handleEdit = (playlist) => {
+    setEditingId(playlist._id);
+    setShowForm(false);
+    setForm({ title: playlist.title, description: playlist.description, isPublic: playlist.isPublic });
+  };
+
+  const myTotal    = playlists.length;
+  const totalViews = playlists.reduce((a, p) => a + (p.views || 0), 0);
+
   return (
-    
-      <div className="dashboard-container">
-        {/* Header */}
-        <div className="dashboard-header fade-in">
-          <div className="header-left">
-            <div className="header-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15V6"/><path d="M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path d="M12 12H3"/><path d="M16 6H3"/><path d="M12 18H3"/>
-              </svg>
-            </div>
-            <h1>My <span className="gradient-text">Playlists</span></h1>
-          </div>
+    <div className="db-root">
+      {/* ── Top Nav ── */}
+      <header className="db-nav">
+        <div className="db-nav-brand">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15V6"/><path d="M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/>
+            <path d="M12 12H3"/><path d="M16 6H3"/><path d="M12 18H3"/>
+          </svg>
+          <span>PlaylistHub</span>
+        </div>
+        <div className="db-nav-actions">
+          <button className="db-nav-btn" onClick={() => navigate("/explore")}>Explore</button>
           <button
-      className="explore-btn"
-      onClick={() => navigate("/explore")}
-    >
-      Explore
-    </button>
-          <button className="gradient-btn" onClick={() => { setShowForm(!showForm); setEditingId(null); }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            className="db-nav-create"
+            onClick={() => { setShowForm((v) => !v); setEditingId(null); }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M5 12h14"/><path d="M12 5v14"/>
             </svg>
-            Create Playlist
+            New Playlist
           </button>
+          <button className="db-nav-logout" onClick={handleLogout}>Logout</button>
+        </div>
+      </header>
+
+      <main className="db-main">
+
+        {/* ── Page Title ── */}
+        <div className="db-page-head fade-in">
+          <h1>My <span className="db-accent-text">Dashboard</span></h1>
+          <p>Manage your playlists and track your learning</p>
         </div>
 
-        {/* Stats */}
-        <div className="stats-row">
-          <div className="stat-card fade-in" style={{ animationDelay: "100ms" }}>
-            <div className="stat-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15V6"/><path d="M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path d="M12 12H3"/><path d="M16 6H3"/><path d="M12 18H3"/>
-              </svg>
-            </div>
-            <div>
-              <h3>{playlists.length}</h3>
-              <p>Total Playlists</p>
-            </div>
+        {/* ── Stats ── */}
+        <div className="db-stats fade-in" style={{ animationDelay: "80ms" }}>
+          <div className="db-stat">
+            <span className="db-stat-value">{myTotal}</span>
+            <span className="db-stat-label">Playlists</span>
           </div>
-          <div className="stat-card fade-in" style={{ animationDelay: "200ms" }}>
-            <div className="stat-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 3v18h18"/><path d="M13 17V9"/><path d="M18 17V5"/><path d="M8 17v-3"/>
-              </svg>
-            </div>
-            <div>
-              <h3>Coming soon</h3>
-              <p>Your Progress</p>
-            </div>
+          <div className="db-stat-divider" />
+          <div className="db-stat">
+            <span className="db-stat-value">{saved.length || "—"}</span>
+            <span className="db-stat-label">Saved</span>
           </div>
-          <div className="stat-card fade-in" style={{ animationDelay: "300ms" }}>
-            <div className="stat-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
-              </svg>
-            </div>
-            <div>
-              <h3>Coming soon</h3>
-              <p>Learning Streak</p>
-            </div>
+          <div className="db-stat-divider" />
+          <div className="db-stat">
+            <span className="db-stat-value">{totalViews.toLocaleString()}</span>
+            <span className="db-stat-label">Total Views</span>
+          </div>
+          <div className="db-stat-divider" />
+          <div className="db-stat">
+            <span className="db-stat-value">—</span>
+            <span className="db-stat-label">Streak</span>
           </div>
         </div>
 
-        {/* Create Form */}
+        {/* ── Create / Edit Form ── */}
         {showForm && (
-          <div className="playlist-form slide-up">
-            <div className="form-header">
-              <h2>New Playlist</h2>
-              <button className="close-btn" onClick={() => setShowForm(false)}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
-                </svg>
-              </button>
-            </div>
-            <input placeholder="Playlist title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
-            <textarea placeholder="What's this playlist about?" value={form.description} rows={3} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-            <div className="visibility-toggle">
-              <button className={`vis-btn ${form.isPublic ? "active" : ""}`} onClick={() => setForm({ ...form, isPublic: true })}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>
-                </svg>
-                Public
-              </button>
-              <button className={`vis-btn ${!form.isPublic ? "active" : ""}`} onClick={() => setForm({ ...form, isPublic: false })}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                </svg>
-                Private
-              </button>
-            </div>
-            <button className="gradient-btn submit-btn" onClick={handleCreate}>Save Playlist</button>
-          </div>
+          <FormPanel
+            title="New Playlist"
+            form={form}
+            setForm={setForm}
+            onSubmit={handleCreate}
+            onClose={() => setShowForm(false)}
+            submitLabel="Create Playlist"
+          />
         )}
-
-        {/* Edit Form */}
         {editingId && (
-          <div className="playlist-form slide-up">
-            <div className="form-header">
-              <h2>Edit Playlist</h2>
-              <button className="close-btn" onClick={() => setEditingId(null)}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
-                </svg>
-              </button>
-            </div>
-            <input placeholder="Playlist title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
-            <textarea placeholder="What's this playlist about?" value={form.description} rows={3} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-            <div className="visibility-toggle">
-              <button className={`vis-btn ${form.isPublic ? "active" : ""}`} onClick={() => setForm({ ...form, isPublic: true })}>Public</button>
-              <button className={`vis-btn ${!form.isPublic ? "active" : ""}`} onClick={() => setForm({ ...form, isPublic: false })}>Private</button>
-            </div>
-            <button className="gradient-btn submit-btn" onClick={() => handleUpdate(editingId)}>Update Playlist</button>
-          </div>
+          <FormPanel
+            title="Edit Playlist"
+            form={form}
+            setForm={setForm}
+            onSubmit={() => handleUpdate(editingId)}
+            onClose={() => setEditingId(null)}
+            submitLabel="Save Changes"
+          />
         )}
 
-        {/* Playlist Grid */}
-        {playlists.length === 0 ? (
-          <div className="empty-state fade-in" style={{ animationDelay: "200ms" }}>
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="empty-icon">
-              <path d="M21 15V6"/><path d="M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path d="M12 12H3"/><path d="M16 6H3"/><path d="M12 18H3"/>
-            </svg>
-            <h3>No playlists yet</h3>
-            <p>Create your first playlist to get started.</p>
-          </div>
-        ) : (
-          <div className="playlist-grid">
-  {playlists.map((playlist, i) => (
-    <div
-      key={playlist._id}
-      className="playlist-card fade-in"
-      style={{ animationDelay: `${100 + i * 80}ms` }}
-      onClick={() => navigate(`/playlist/${playlist._id}`)}
-    >
-        <div className="playlist-cover">
-    <img
-      src={
-        playlist.videos?.[0]?.thumbnailUrl ||
-        "https://via.placeholder.com/600x340?text=No+Videos"
-      }
-      alt={playlist.title}
-    />
-  </div>
-                <div className="card-top">
-                  <div className="card-title-row">
-                    <h3>{playlist.title}</h3>
-                    <span className={`badge ${playlist.isPublic ? "badge-public" : "badge-private"}`}>
-                      {playlist.isPublic ? "🌐 Public" : "🔒 Private"}
-                    </span>
-                  </div>
-                  <p className="card-desc">{playlist.description}</p>
-                </div>
-                <div className="card-bottom">
-                  <div className="playlist-meta">
-                    <span>🎬 {playlist.totalVideos || 0} videos</span>
-                    <span>👁 {playlist.views || 0} views</span>
-                  </div>
-                  <div className="card-actions">
-                    <button className="edit-btn" onClick={(e) => {  e.stopPropagation(); setEditingId(playlist._id); setShowForm(false); setForm({ title: playlist.title, description: playlist.description, isPublic: playlist.isPublic }); }}>
-                      ✏️ Edit
-                    </button>
-                    <button className="delete-btn" onClick={(e) =>{ e.stopPropagation();  handleDelete(playlist._id)}}>
-                      🗑 Delete
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* ── Tabs ── */}
+        <div className="db-tabs">
+          {TABS.map((t) => (
+            <button
+              key={t}
+              className={`db-tab ${activeTab === t ? "db-tab--active" : ""}`}
+              onClick={() => setActiveTab(t)}
+            >
+              {t}
+              <span className="db-tab-count">
+                {t === "My Playlists" ? myTotal : saved.length}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* ── My Playlists ── */}
+        {activeTab === "My Playlists" && (
+          playlists.length === 0 ? (
+            <div className="db-empty fade-in">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15V6"/><path d="M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/>
+                <path d="M12 12H3"/><path d="M16 6H3"/><path d="M12 18H3"/>
+              </svg>
+              <h3>No playlists yet</h3>
+              <p>Hit "New Playlist" to get started.</p>
+            </div>
+          ) : (
+            <div className="db-grid">
+              {playlists.map((p, i) => (
+                <PlaylistCard
+                  key={p._id}
+                  playlist={p}
+                  index={i}
+                  isSaved={false}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onNavigate={(id) => navigate(`/playlist/${id}`)}
+                />
+              ))}
+            </div>
+          )
         )}
-      </div>
-    
+
+        {/* ── Saved Playlists ── */}
+        {activeTab === "Saved" && (
+          loadingSaved ? (
+            <div className="db-grid">
+              {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} i={i} />)}
+            </div>
+          ) : saved.length === 0 ? (
+            <div className="db-empty fade-in">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+              </svg>
+              <h3>No saved playlists</h3>
+              <p>Browse Explore and save playlists you like.</p>
+              <button className="db-submit-btn db-empty-cta" onClick={() => navigate("/explore")}>
+                Go to Explore
+              </button>
+            </div>
+          ) : (
+            <div className="db-grid">
+              {saved.map((p, i) => (
+                <PlaylistCard
+                  key={p._id}
+                  playlist={p}
+                  index={i}
+                  isSaved
+                  onUnsave={handleUnsave}
+                  onNavigate={(id) => navigate(`/playlist/${id}`)}
+                />
+              ))}
+            </div>
+          )
+        )}
+
+      </main>
+    </div>
   );
 }

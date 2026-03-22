@@ -100,3 +100,69 @@ export const getNewestPlaylists = async () => {
   if (!res.ok) throw new Error("Failed to fetch newest playlists");
   return res.json();
 };
+
+export const savePlaylist = async (playlistId) => {
+  const res = await fetch(
+    `${BASE_URL}/saved/${playlistId}`,
+    {
+      method: "POST",
+      credentials: "include"
+    }
+  );
+
+  if (!res.ok) throw new Error("Failed to save playlist");
+  return res.json();
+};
+
+export const removeSavedPlaylist = async (playlistId) => {
+  const res = await fetch(
+    `${BASE_URL}/saved/${playlistId}`,
+    {
+      method: "DELETE",
+      credentials: "include"
+    }
+  );
+
+  if (!res.ok) throw new Error("Failed to remove saved playlist");
+  return res.json();
+};
+
+export const getSavedPlaylists = async () => {
+  const res = await fetch(
+    `${BASE_URL}/saved`,
+    {
+      credentials: "include"
+    }
+  );
+
+  if (!res.ok) throw new Error("Failed to fetch saved playlists");
+  return res.json();
+};
+
+export const ratePlaylist = async (playlistId, rating) => {
+  const res = await fetch(
+    `${BASE_URL}/${playlistId}/ratings`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ rating })
+    }
+  );
+
+  return res.json();
+};
+
+export const deleteRating = async (playlistId) => {
+  const res = await fetch(
+    `${BASE_URL}/${playlistId}/rate`,
+    {
+      method: "DELETE",
+      credentials: "include"
+    }
+  );
+
+  return res.json();
+};
