@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8000/api/v2";
+const BASE_URL = import.meta.env.VITE_API_URL + "/api/v2";
 
 export const searchPlaylists = async ({ q, page = 1, limit = 20, sort = "relevance" }) => {
   const params = new URLSearchParams({ q, page, limit, sort });

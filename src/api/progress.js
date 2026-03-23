@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8000/api/v2/progress";
+const BASE_URL = import.meta.env.VITE_API_URL + "/api/v2/progress";
 
 export const startVideo = async (playlistId, videoId) => {
   const res = await fetch(

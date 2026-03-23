@@ -1,6 +1,6 @@
 import React from "react";
 
-const BASE_URL = "http://localhost:8000/api/v2/users";
+const BASE_URL = import.meta.env.VITE_API_URL + "/api/v2/users";
 
 export const registerUser = async (data) => {
  const res = await fetch(`${BASE_URL}/register`, {
