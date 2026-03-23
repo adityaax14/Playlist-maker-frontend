@@ -82,7 +82,7 @@ export default function PlaylistDetail() {
     };
 
     loadPlaylist();
-  }, [playlistId, videoId, navigate]);
+  }, [playlistId]);
 
   /* ── Navigation ── */
   const currentIndex = playlist?.videos?.findIndex(
@@ -275,7 +275,7 @@ export default function PlaylistDetail() {
 
       {/* ── Header ── */}
       <div className="playlist-header">
-        <button className="back-btn" onClick={() => navigate("/dashboard")}>
+        <button className="back-btn" onClick={() => navigate(-1)}>
           ← Back to Playlists
         </button>
 

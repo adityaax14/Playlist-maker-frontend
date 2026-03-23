@@ -10,16 +10,34 @@ import {
 import "../styles/dashboard.css";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../api/auth";
+import { useAuth } from "../context/AuthContext";
 import StarRating from "./StarRating.jsx";
 
 const TABS = ["My Playlists", "Saved"];
 
 /* ════════════════════════════════════════════════
-   SUB-COMPONENTS — all defined OUTSIDE Dashboard
-   so React never recreates them on re-render,
-   which would cause inputs to lose focus / remount.
+   USER MENU
    ════════════════════════════════════════════════ */
+function UserMenu({ username }) {
+  const [open, setOpen] = useState(false);
 
+  return (
+    <div className="db-user-menu" onBlur={() => setOpen(false)} tabIndex={0}>
+      <button className="db-user-avatar" onClick={() => setOpen((v) => !v)}>
+        {(username || "U")[0].toUpperCase()}
+      </button>
+      {open && (
+        <div className="db-user-dropdown">
+          <span className="db-user-name">👤 {username}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   FORM PANEL
+   ════════════════════════════════════════════════ */
 function FormPanel({ title, form, setForm, onSubmit, onClose, submitLabel }) {
   return (
     <div className="db-form slide-up">
@@ -70,6 +88,9 @@ function FormPanel({ title, form, setForm, onSubmit, onClose, submitLabel }) {
   );
 }
 
+/* ════════════════════════════════════════════════
+   PLAYLIST CARD
+   ════════════════════════════════════════════════ */
 function PlaylistCard({ playlist, index, isSaved, onEdit, onDelete, onUnsave, onNavigate }) {
   return (
     <div
@@ -104,7 +125,7 @@ function PlaylistCard({ playlist, index, isSaved, onEdit, onDelete, onUnsave, on
 
       <div className="db-card-body">
         <h3 className="db-card-title">{playlist.title}</h3>
-        <p  className="db-card-desc">{playlist.description}</p>
+        <p className="db-card-desc">{playlist.description}</p>
 
         {isSaved && playlist.creator && (
           <div className="db-card-creator">
@@ -150,6 +171,9 @@ function PlaylistCard({ playlist, index, isSaved, onEdit, onDelete, onUnsave, on
   );
 }
 
+/* ════════════════════════════════════════════════
+   SKELETON
+   ════════════════════════════════════════════════ */
 function Skeleton({ i }) {
   return (
     <div className="db-skeleton" style={{ animationDelay: `${i * 60}ms` }}>
@@ -167,25 +191,34 @@ function Skeleton({ i }) {
    DASHBOARD
    ════════════════════════════════════════════════ */
 export default function Dashboard() {
-  const [playlists, setPlaylists]       = useState([]);
-  const [saved, setSaved]               = useState([]);
-  const [activeTab, setActiveTab]       = useState("My Playlists");
-  const [showForm, setShowForm]         = useState(false);
-  const [form, setForm]                 = useState({ title: "", description: "", isPublic: true });
-  const [editingId, setEditingId]       = useState(null);
-  const [loadingSaved, setLoadingSaved] = useState(false);
+  const [playlists,    setPlaylists]    = useState([]);
+  const [saved,        setSaved]        = useState([]);
+  const [activeTab,    setActiveTab]    = useState("My Playlists");
+  const [showForm,     setShowForm]     = useState(false);
+  const [form,         setForm]         = useState({ title: "", description: "", isPublic: true });
+  const [editingId,    setEditingId]    = useState(null);
+  const [loadingOwn,   setLoadingOwn]   = useState(true);
+  const [loadingSaved, setLoadingSaved] = useState(true);
+
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     loadPlaylists();
-    loadSaved(); // load on mount so stats bar count is correct immediately
+    loadSaved();
   }, []);
 
   const loadPlaylists = async () => {
+    setLoadingOwn(true);
     try {
       const res = await fetchMyPlaylists();
       setPlaylists(res.data.playlists || []);
-    } catch (err) { console.error(err); setPlaylists([]); }
+    } catch (err) {
+      console.error(err);
+      setPlaylists([]);
+    } finally {
+      setLoadingOwn(false);
+    }
   };
 
   const loadSaved = async () => {
@@ -193,8 +226,12 @@ export default function Dashboard() {
     try {
       const res = await getSavedPlaylists();
       setSaved(res.data || []);
-    } catch (err) { console.error(err); setSaved([]); }
-    finally { setLoadingSaved(false); }
+    } catch (err) {
+      console.error(err);
+      setSaved([]);
+    } finally {
+      setLoadingSaved(false);
+    }
   };
 
   const handleLogout = async () => {
@@ -206,10 +243,14 @@ export default function Dashboard() {
     if (!form.title || !form.description) { alert("Title and description required"); return; }
     try {
       const res = await createPlaylist(form);
-      setPlaylists((prev) => [res.data, ...prev]);
+      const newPlaylist = { ...res.data, videos: res.data.videos || [] };
+      setPlaylists((prev) => [newPlaylist, ...prev]);
       setForm({ title: "", description: "", isPublic: true });
       setShowForm(false);
-    } catch (err) { console.error(err); alert("Failed to create playlist"); }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create playlist");
+    }
   };
 
   const handleUpdate = async (id) => {
@@ -217,21 +258,28 @@ export default function Dashboard() {
       const res = await updatePlaylist(id, form);
       setPlaylists((prev) => prev.map((p) => (p._id === id ? res.data : p)));
       setEditingId(null);
-    } catch (err) { console.error(err); }
+      setForm({ title: "", description: "", isPublic: true });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleDelete = async (id) => {
     try {
       await deletePlaylist(id);
       setPlaylists((prev) => prev.filter((p) => p._id !== id));
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleUnsave = async (id) => {
     try {
       await removeSavedPlaylist(id);
       setSaved((prev) => prev.filter((p) => p._id !== id));
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleEdit = (playlist) => {
@@ -265,6 +313,7 @@ export default function Dashboard() {
             </svg>
             New Playlist
           </button>
+          <UserMenu username={user?.username} />
           <button className="db-nav-logout" onClick={handleLogout}>Logout</button>
         </div>
       </header>
@@ -285,7 +334,7 @@ export default function Dashboard() {
           </div>
           <div className="db-stat-divider" />
           <div className="db-stat">
-            <span className="db-stat-value">{saved.length || "—"}</span>
+            <span className="db-stat-value">{saved.length ?? "—"}</span>
             <span className="db-stat-label">Saved</span>
           </div>
           <div className="db-stat-divider" />
@@ -317,7 +366,10 @@ export default function Dashboard() {
             form={form}
             setForm={setForm}
             onSubmit={() => handleUpdate(editingId)}
-            onClose={() => setEditingId(null)}
+            onClose={() => {
+              setEditingId(null);
+              setForm({ title: "", description: "", isPublic: true });
+            }}
             submitLabel="Save Changes"
           />
         )}
@@ -340,7 +392,11 @@ export default function Dashboard() {
 
         {/* ── My Playlists ── */}
         {activeTab === "My Playlists" && (
-          playlists.length === 0 ? (
+          loadingOwn ? (
+            <div className="db-grid">
+              {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} i={i} />)}
+            </div>
+          ) : playlists.length === 0 ? (
             <div className="db-empty fade-in">
               <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15V6"/><path d="M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/>

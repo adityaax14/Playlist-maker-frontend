@@ -8,8 +8,11 @@ import {
 } from "../api/playlist.js";
 import { searchPlaylists } from "../api/Search.api.js";
 import "../styles/explore.css";
+import "../styles/dashboard.css";
 import StarRating from "./StarRating";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { logoutUser } from "../api/auth";
+import { useAuth } from "../context/AuthContext";
 
 /* ─────────────────────────────────────────────
    CONSTANTS
@@ -23,12 +26,32 @@ const SECTIONS = [
 const SORT_OPTIONS = [
   { value: "relevance", label: "Most Relevant" },
   { value: "views",     label: "Most Viewed"   },
-  { value: "rating",    label: "Top Rated"      },
-  { value: "newest",    label: "Newest"         },
+  { value: "rating",    label: "Top Rated"     },
+  { value: "newest",    label: "Newest"        },
 ];
 
 /* ─────────────────────────────────────────────
-   HIGHLIGHT — marks matched keywords in text
+   USER MENU
+───────────────────────────────────────────── */
+function UserMenu({ username }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="db-user-menu" onBlur={() => setOpen(false)} tabIndex={0}>
+      <button className="db-user-avatar" onClick={() => setOpen((v) => !v)}>
+        {(username || "U")[0].toUpperCase()}
+      </button>
+      {open && (
+        <div className="db-user-dropdown">
+          <span className="db-user-name">👤 {username}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   HIGHLIGHT
 ───────────────────────────────────────────── */
 function Highlight({ text = "", query = "" }) {
   if (!query.trim()) return <span>{text}</span>;
@@ -38,7 +61,6 @@ function Highlight({ text = "", query = "" }) {
     "gi"
   );
   const parts = text.split(pattern);
-  // reset lastIndex between calls
   return (
     <span>
       {parts.map((part, i) =>
@@ -51,7 +73,7 @@ function Highlight({ text = "", query = "" }) {
 }
 
 /* ─────────────────────────────────────────────
-   PLAYLIST CARD — outside Explore to avoid remount
+   PLAYLIST CARD
 ───────────────────────────────────────────── */
 function PlaylistCard({ playlist, index, savedIds, onSave, query = "" }) {
   const navigate = useNavigate();
@@ -64,7 +86,6 @@ function PlaylistCard({ playlist, index, savedIds, onSave, query = "" }) {
       style={{ "--delay": `${index * 55}ms` }}
       onClick={() => navigate(`/playlist/${playlist._id}`)}
     >
-      {/* Thumbnail */}
       <div className="pc-thumb">
         {playlist.videos?.[0]?.thumbnailUrl ? (
           <img src={playlist.videos[0].thumbnailUrl} alt={playlist.title} loading="lazy" />
@@ -83,7 +104,6 @@ function PlaylistCard({ playlist, index, savedIds, onSave, query = "" }) {
         </div>
       </div>
 
-      {/* Body */}
       <div className="pc-body">
         <h3 className="pc-title">
           {isSearch ? <Highlight text={playlist.title} query={query} /> : playlist.title}
@@ -197,30 +217,50 @@ function Pagination({ current, total, onChange }) {
 }
 
 /* ─────────────────────────────────────────────
-   EXPLORE — main component
+   EXPLORE
 ───────────────────────────────────────────── */
 export default function Explore() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { user }  = useAuth();
 
-  const [trending,       setTrending]       = useState([]);
-  const [topRated,       setTopRated]       = useState([]);
-  const [newest,         setNewest]         = useState([]);
-  const [loading,        setLoading]        = useState(true);
+  const [trending,      setTrending]      = useState([]);
+  const [topRated,      setTopRated]      = useState([]);
+  const [newest,        setNewest]        = useState([]);
+  const [loading,       setLoading]       = useState(true);
 
-  const [inputVal,       setInputVal]       = useState(searchParams.get("q") || "");
-  const [activeQuery,    setActiveQuery]    = useState(searchParams.get("q") || "");
-  const [searchResults,  setSearchResults]  = useState([]);
-  const [searchTotal,    setSearchTotal]    = useState(0);
-  const [searchPage,     setSearchPage]     = useState(1);
-  const [searchPages,    setSearchPages]    = useState(1);
-  const [sort,           setSort]           = useState("relevance");
-  const [searching,      setSearching]      = useState(false);
-  const [searched,       setSearched]       = useState(!!searchParams.get("q"));
+  const [inputVal,      setInputVal]      = useState(searchParams.get("q") || "");
+  const [activeQuery,   setActiveQuery]   = useState(searchParams.get("q") || "");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchTotal,   setSearchTotal]   = useState(0);
+  const [searchPage,    setSearchPage]    = useState(1);
+  const [searchPages,   setSearchPages]   = useState(1);
+  const [sort,          setSort]          = useState("relevance");
+  const [searching,     setSearching]     = useState(false);
+  const [searched,      setSearched]      = useState(!!searchParams.get("q"));
 
-  const [activeSection,  setActiveSection]  = useState("trending");
-  const [savedIds,       setSavedIds]       = useState(new Set());
+  const [activeSection, setActiveSection] = useState("trending");
+  const [savedIds,      setSavedIds]      = useState(new Set());
 
-  /* ── On mount ── */
+  /* ── Save scroll position when leaving ── */
+  useEffect(() => {
+    const handleScroll = () => {
+      sessionStorage.setItem("exploreScrollY", window.scrollY);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  /* ── Restore scroll position when returning ── */
+  useEffect(() => {
+    const savedY = sessionStorage.getItem("exploreScrollY");
+    if (savedY) {
+      setTimeout(() => {
+        window.scrollTo({ top: parseInt(savedY), behavior: "instant" });
+      }, 50);
+    }
+  }, [loading]);
+
   useEffect(() => {
     loadSections();
     loadSavedIds();
@@ -249,7 +289,6 @@ export default function Explore() {
     } catch {}
   };
 
-  /* ── Core search ── */
   const runSearch = async (q, page = 1, srt = sort) => {
     if (!q.trim()) return;
     setSearching(true);
@@ -301,6 +340,11 @@ export default function Explore() {
     } catch (err) { console.error("Save failed", err); }
   };
 
+  const handleLogout = async () => {
+    try { await logoutUser(); navigate("/login"); }
+    catch (err) { console.error(err); }
+  };
+
   const sectionData = { trending, topRated, newest };
   const currentList = sectionData[activeSection] || [];
 
@@ -313,19 +357,23 @@ export default function Explore() {
         <div className="orb orb-3" />
       </div>
 
-      <div className="ex-wrap">
+      {/* ── Navbar ── */}
+      <header className="db-nav">
+        <div className="db-nav-brand">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15V6"/><path d="M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/>
+            <path d="M12 12H3"/><path d="M16 6H3"/><path d="M12 18H3"/>
+          </svg>
+          <span>PlaylistHub</span>
+        </div>
+        <div className="db-nav-actions">
+          <button className="db-nav-btn" onClick={() => navigate("/dashboard")}>Dashboard</button>
+          <UserMenu username={user?.username} />
+          <button className="db-nav-logout" onClick={handleLogout}>Logout</button>
+        </div>
+      </header>
 
-        {/* ── Header ── */}
-        <header className="ex-header">
-          <div className="ex-header-text">
-            <div className="ex-eyebrow">Discover · Learn · Grow</div>
-            <h1 className="ex-heading">
-              Explore<br />
-              <span className="ex-heading-accent">Playlists</span>
-            </h1>
-          </div>
-          <p className="ex-subtext">Curated learning paths from creators worldwide</p>
-        </header>
+      <div className="ex-wrap">
 
         {/* ── Search bar ── */}
         <form className="ex-search-wrap" onSubmit={handleSubmit}>
@@ -348,12 +396,9 @@ export default function Explore() {
           </button>
         </form>
 
-        {/* ═══════════════════════════════════════
-            SEARCH MODE
-        ═══════════════════════════════════════ */}
+        {/* ── SEARCH MODE ── */}
         {searched && (
           <>
-            {/* Sort + result count row */}
             <div className="ex-search-toolbar">
               <div className="ex-search-meta">
                 {!searching && (
@@ -365,7 +410,6 @@ export default function Explore() {
                 )}
                 <button className="ex-clear-results" onClick={clearSearch}>✕ Clear</button>
               </div>
-
               <div className="ex-sort-row">
                 {SORT_OPTIONS.map(opt => (
                   <button
@@ -380,14 +424,12 @@ export default function Explore() {
               </div>
             </div>
 
-            {/* Skeletons while searching */}
             {searching && (
               <div className="ex-grid">
                 {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} i={i} />)}
               </div>
             )}
 
-            {/* Results */}
             {!searching && searchResults.length > 0 && (
               <>
                 <div className="ex-grid">
@@ -406,7 +448,6 @@ export default function Explore() {
               </>
             )}
 
-            {/* Empty */}
             {!searching && searchResults.length === 0 && (
               <div className="ex-empty-search">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -419,12 +460,9 @@ export default function Explore() {
           </>
         )}
 
-        {/* ═══════════════════════════════════════
-            BROWSE MODE (no active search)
-        ═══════════════════════════════════════ */}
+        {/* ── BROWSE MODE ── */}
         {!searched && (
           <>
-            {/* Tab Navigation */}
             <nav className="ex-tabs">
               {SECTIONS.map((s) => (
                 <button
@@ -439,7 +477,6 @@ export default function Explore() {
               ))}
             </nav>
 
-            {/* Section grid */}
             <section className="ex-section ex-section--main">
               <div className="ex-grid">
                 {loading

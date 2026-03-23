@@ -589,3 +589,48 @@
   .db-grid   { grid-template-columns: 1fr; }
   .db-page-head h1 { font-size: 30px; }
 }
+
+.db-user-menu {
+  position: relative;
+  outline: none;
+}
+
+.db-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  border: 2px solid rgba(255,255,255,0.15);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.db-user-avatar:hover {
+  transform: scale(1.08);
+  border-color: rgba(255,255,255,0.4);
+}
+
+.db-user-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  background: #1a1a2e;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px 16px;
+  white-space: nowrap;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+.db-user-name {
+  color: #e2e8f0;
+  font-size: 13px;
+  font-weight: 500;
+}
