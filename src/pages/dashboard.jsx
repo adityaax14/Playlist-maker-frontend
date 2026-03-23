@@ -6,11 +6,11 @@ import {
   deletePlaylist,
   getSavedPlaylists,
   removeSavedPlaylist,
-} from "../api/playlist";
+} from "../api/playlist.js";
 import "../styles/dashboard.css";
 import { useNavigate } from "react-router-dom";
-import { logoutUser } from "../api/auth";
-import { useAuth } from "../context/AuthContext";
+import { logoutUser } from "../api/auth.js";
+import { useAuth } from "../context/AuthContext.jsx";
 import StarRating from "./StarRating.jsx";
 
 const TABS = ["My Playlists", "Saved"];
